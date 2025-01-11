@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import InputComponent from './components/InputComponent';
 import WeatherDisplayComponent from './components/WeatherDisplayComponent';
-import Navbar from './components/Navbar';import { getCurrentLocation, fetchWeatherByCoordinates } from './components/Location';
+import Navbar from './components/Navbar';
+import { getCurrentLocation, fetchWeatherByCoordinates } from './components/Location';
 import About from './components/About';
 
 const App = () => {
@@ -10,6 +11,7 @@ const App = () => {
   const [city, setCity] = useState('');
   const [weatherData, setWeatherData] = useState(null);
 
+  // Fetch weather data based on user's current location when the component mounts
   useEffect(() => {
     getCurrentLocation(
       position => {
@@ -17,7 +19,7 @@ const App = () => {
         fetchWeatherByCoordinates(latitude, longitude)
           .then(data => {
             setWeatherData(data);
-            setAlert({ message: `Weather at your location:${weatherData.name} , ${data.weather[0].description}, ${data.main.temp}°C`, type: 'primary' });
+            setAlert({ message: `Weather at your location: ${data.weather[0].description}, ${data.main.temp}°C`, type: 'primary' });
           })
           .catch(err => {
             setAlert({ message: err.message, type: 'danger' });
@@ -27,8 +29,9 @@ const App = () => {
         setAlert({ message: 'Failed to get your location. Please enter a city name.', type: 'danger' });
       }
     );
-  }, []);
+  }, []); // Empty dependency array to run only once on mount
 
+  // Fetch weather data based on the city name entered by the user
   const fetchWeather = async () => {
     if (!city) {
       setAlert({ message: 'Please enter a city name.', type: 'danger' });
@@ -48,12 +51,14 @@ const App = () => {
     }
   };
 
+  // Reset weather data
   const resetWeatherData = () => {
     if (weatherData) {
       setWeatherData(null);
     }
   };
 
+  // Get background image based on the weather description
   const getBackgroundImage = (weatherDescription) => {
     switch (weatherDescription) {
       case 'clear sky':
@@ -72,36 +77,36 @@ const App = () => {
         return 'url(https://cdn.pixabay.com/photo/2016/10/25/12/28/thunderstorm-1768742_640.jpg)';
       case 'snow':
         return 'url(https://cdn.pixabay.com/photo/2014/12/02/22/05/snowflakes-554635_640.jpg)';
-      case 'overcast clouds':
-        return 'url(https://cdn.pixabay.com/photo/2016/10/25/12/28/thunderstorm-1768742_640.jpg)';
+      case 'mist':
+        return 'url(/path/to/mist.jpg)';
       default:
-        return 'url(https://cdn.pixabay.com/photo/2014/12/02/22/05/snowflakes-554635_640.jpg)';
+        return 'url(https://th.bing.com/th/id/R.57756ef806bb39b64107a4fbdeafd140?rik=F9jrzFZCcfkIrQ&riu=http%3a%2f%2fgetwallpapers.com%2fwallpaper%2ffull%2fd%2ff%2fe%2f16878.jpg&ehk=HuGdYwPDYdAZ2RmK2J94DlwcGTV25ZlMUaw3rLRe2X0%3d&risl=&pid=ImgRaw&r=0)';
     }
   };
 
   return (
     <>
-      <Navbar />
+      <Navbar /> {/* Navbar component */}
       <div
-        className="container mt-7 weather-section"
+        className="container mt-5 weather-section"
         style={{
-          backgroundImage: weatherData ? getBackgroundImage(weatherData.weather[0].description) : 'none',
+          backgroundImage: weatherData ? getBackgroundImage(weatherData.weather[0].description) : 'none', // Set background image
         }}
       >
         <div className="text-center mb-4">
           <h1 className="display-4">Weather App</h1>
         </div>
         <div className="mb-3">
-          <InputComponent alert={alert.message} city={city} setCity={setCity} fetchWeather={fetchWeather} />
+          <InputComponent alert={alert.message} city={city} setCity={setCity} fetchWeather={fetchWeather} /> {/* Input component */}
         </div>
         {alert.message && (
           <div className={`alert alert-${alert.type}`} role="alert">
-            {alert.message}
+            {alert.message} {/* Alert message */}
           </div>
         )}
-        <WeatherDisplayComponent weatherData={weatherData} />
+        <WeatherDisplayComponent weatherData={weatherData} /> {/* Weather display component */}
       </div>
-      <About />
+      <About /> {/* About component */}
     </>
   );
 };
